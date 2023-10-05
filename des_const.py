@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Initial permut matrix for the datas
 PI: list[int] = [
     58,
