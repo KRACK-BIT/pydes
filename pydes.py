@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf8 -*-
-from des_boxes import CP_1, CP_2, PI, PI_1, S_BOX, SHIFT, E, P
+from typing import Optional
+
+from des_const import CP_1, CP_2, PI, PI_1, S_BOX, SHIFT, E, P
 
 
 def string_to_bit_array(text):  # Convert a string into a list of bits
@@ -24,7 +26,7 @@ def bit_array_to_string(array):  # Recreate the string from the bit array
 def binvalue(val, bitsize):  # Return the binary value as a string of the given size
     binval = bin(val)[2:] if isinstance(val, int) else bin(ord(val))[2:]
     if len(binval) > bitsize:
-        raise "binary value larger than the expected size"
+        raise ValueError("binary value larger than the expected size")
     while len(binval) < bitsize:
         binval = "0" + binval  # Add as many 0 as needed to get the wanted size
     return binval
@@ -38,15 +40,15 @@ ENCRYPT = 1
 DECRYPT = 0
 
 
-class des:
+class BlockCipherDES:
     def __init__(self):
-        self.password = None
-        self.text = None
+        self.password: Optional[str] = None
+        self.text: Optional[str] = None
         self.keys = list()
 
     def run(self, key, text, action=ENCRYPT, padding=False):
         if len(key) < 8:
-            raise "Key Should be 8 bytes long"
+            raise ValueError("Key Should be 8 bytes long")
         elif len(key) > 8:
             key = key[:8]  # If key size is above 8bytes, cut to be 8bytes long
 
@@ -58,7 +60,7 @@ class des:
         elif (
             len(self.text) % 8 != 0
         ):  # If not padding specified data size must be multiple of 8 bytes
-            raise "Data size should be multiple of 8"
+            raise ValueError("Data size should be multiple of 8")
 
         self.generatekeys()  # Generate all the keys
         text_blocks = nsplit(
@@ -140,7 +142,7 @@ class des:
     def shift(self, g, d, n):  # Shift a list of the given value
         return g[n:] + g[:n], d[n:] + d[:n]
 
-    def addPadding(self):  # Add padding to the datas using PKCS5 spec.
+    def addPadding(self) -> None:  # Add padding to the datas using PKCS5 spec.
         pad_len = 8 - (len(self.text) % 8)
         self.text += pad_len * chr(pad_len)
 
@@ -160,8 +162,8 @@ class des:
 if __name__ == "__main__":
     key = "secret_k"
     text = "Hello wo"
-    d = des()
-    r = d.encrypt(key, text)
-    r2 = d.decrypt(key, r)
+    d = BlockCipherDES()
+    r: str = d.encrypt(key=key, text=text)
+    r2: str = d.decrypt(key=key, text=r)
     print("Ciphered: %r" % r)
     print("Deciphered: ", r2)
