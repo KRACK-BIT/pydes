@@ -139,8 +139,10 @@ class BlockCipherDES:
 if __name__ == "__main__":
     key = "secret_k"
     text = "Hello wo"
-    d = BlockCipherDES()
-    r: str = d.encrypt(key=key, text=text)
-    r2: str = d.decrypt(key=key, text=r)
-    print("Ciphered: %r" % r)
-    print("Deciphered: ", r2)
+    DES = BlockCipherDES()
+    r: str = DES.encrypt(key=key, text=text)
+    r2: str = DES.decrypt(key=key, text=r)
+    print(f"Ciphered: {r}")
+    print(f"Deciphered: {r2}")
+    assert r2 == text
+    print("Base test case holds!")
