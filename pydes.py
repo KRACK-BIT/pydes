@@ -17,7 +17,7 @@ class BlockCipherDES:
     def __init__(self):
         self.password: Optional[str] = None
         self.text: Optional[str] = None
-        self.keys = list()
+        self.round_keys = list()
 
     def run(self, key, text, action=CipherMode.ENCRYPT, padding=False):
         if len(key) < 8:
@@ -48,10 +48,10 @@ class BlockCipherDES:
             for i in range(16):  # Do the 16 rounds
                 d_e = self.expand(d, E)  # Expand d to match Ki size (48bits)
                 if action == CipherMode.ENCRYPT:
-                    tmp = self.xor(self.keys[i], d_e)  # If encrypt use Ki
+                    tmp = self.xor(self.round_keys[i], d_e)  # If encrypt use Ki
                 else:
                     tmp = self.xor(
-                        self.keys[15 - i], d_e
+                        self.round_keys[15 - i], d_e
                     )  # If decrypt start by the last key
                 tmp = self.substitute(tmp)  # Method that will apply the SBOXes
                 tmp = self.permut(tmp, P)
@@ -101,7 +101,7 @@ class BlockCipherDES:
         return [x ^ y for x, y in zip(t1, t2)]
 
     def generatekeys(self):  # Algorithm that generates all the keys
-        self.keys = []
+        self.round_keys = []
         key = string_to_bit_array(self.password)
         key = self.permut(key, CP_1)  # Apply the initial permut on the key
         g, d = nsplit(key, 28)  # Split it in to (g->LEFT),(d->RIGHT)
@@ -110,7 +110,9 @@ class BlockCipherDES:
                 g, d, SHIFT[i]
             )  # Apply the shift associated with the round (not always 1)
             tmp = g + d  # Merge them
-            self.keys.append(self.permut(tmp, CP_2))  # Apply the permut to get the Ki
+            self.round_keys.append(
+                self.permut(tmp, CP_2)
+            )  # Apply the permut to get the Ki
 
     def shift(
         self, g: list, d: list, shift
