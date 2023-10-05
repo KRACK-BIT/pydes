@@ -5,7 +5,22 @@ from typing import Optional
 from des_const import CP_1, CP_2, PI, PI_1, S_BOX, SHIFT, E, P
 
 
-def string_to_bit_array(text):  # Convert a string into a list of bits
+def nsplit(s: list, n: int) -> list[list]:
+    """Split a list into sublists of size `n`"""
+    return [s[k : k + n] for k in range(0, len(s), n)]
+
+
+def binvalue(val, bitsize) -> str:
+    """Return the binary value as a string of the given size"""
+    binval = bin(val)[2:] if isinstance(val, int) else bin(ord(val))[2:]
+    if len(binval) > bitsize:
+        raise ValueError("binary value larger than the expected size")
+    while len(binval) < bitsize:
+        binval: str = "0" + binval  # Add as many 0 as needed to get the wanted size
+    return binval
+
+
+def string_to_bit_array(text) -> list[int]:  # Convert a string into a list of bits
     array = list()
     for char in text:
         binval = binvalue(char, 8)  # Get the char value on one byte
@@ -13,7 +28,7 @@ def string_to_bit_array(text):  # Convert a string into a list of bits
     return array
 
 
-def bit_array_to_string(array):  # Recreate the string from the bit array
+def bit_array_to_string(array) -> str:  # Recreate the string from the bit array
     res = "".join(
         [
             chr(int(y, 2))
@@ -21,19 +36,6 @@ def bit_array_to_string(array):  # Recreate the string from the bit array
         ]
     )
     return res
-
-
-def binvalue(val, bitsize):  # Return the binary value as a string of the given size
-    binval = bin(val)[2:] if isinstance(val, int) else bin(ord(val))[2:]
-    if len(binval) > bitsize:
-        raise ValueError("binary value larger than the expected size")
-    while len(binval) < bitsize:
-        binval = "0" + binval  # Add as many 0 as needed to get the wanted size
-    return binval
-
-
-def nsplit(s, n):  # Split a list into sublists of size "n"
-    return [s[k : k + n] for k in range(0, len(s), n)]
 
 
 ENCRYPT = 1
@@ -139,24 +141,28 @@ class BlockCipherDES:
             tmp = g + d  # Merge them
             self.keys.append(self.permut(tmp, CP_2))  # Apply the permut to get the Ki
 
-    def shift(self, g, d, n):  # Shift a list of the given value
-        return g[n:] + g[:n], d[n:] + d[:n]
+    def shift(
+        self, g: list, d: list, shift
+    ) -> tuple[list, list]:  # Shift a list of the given value
+        return g[shift:] + g[:shift], d[shift:] + d[:shift]
 
     def addPadding(self) -> None:  # Add padding to the datas using PKCS5 spec.
-        pad_len = 8 - (len(self.text) % 8)
+        if self.text is None:
+            raise ValueError("No text to pad")
+        pad_len: int = 8 - (len(self.text) % 8)
         self.text += pad_len * chr(pad_len)
 
     def removePadding(
-        self, data
-    ):  # Remove the padding of the plain text (it assume there is padding)
-        pad_len = ord(data[-1])
+        self, data: str
+    ) -> str:  # Remove the padding of the plain text (it assume there is padding)
+        pad_len: int = ord(data[-1])
         return data[:-pad_len]
 
-    def encrypt(self, key, text, padding=False):
-        return self.run(key, text, ENCRYPT, padding)
+    def encrypt(self, key, text, padding=False) -> str:
+        return self.run(key=key, text=text, action=ENCRYPT, padding=padding)
 
-    def decrypt(self, key, text, padding=False):
-        return self.run(key, text, DECRYPT, padding)
+    def decrypt(self, key, text, padding=False) -> str:
+        return self.run(key=key, text=text, action=DECRYPT, padding=padding)
 
 
 if __name__ == "__main__":
