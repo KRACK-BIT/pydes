@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf8 -*-
 
+from enum import Enum
 from typing import Optional
 
 from bit_helpers import binvalue, bit_array_to_string, nsplit, string_to_bit_array
 from des_const import CP_1, CP_2, PI, PI_1, S_BOX, SHIFT, E, P
 
-ENCRYPT = 1
-DECRYPT = 0
+
+class CipherMode(Enum):
+    ENCRYPT = 1
+    DECRYPT = 0
 
 
 class BlockCipherDES:
@@ -16,7 +19,7 @@ class BlockCipherDES:
         self.text: Optional[str] = None
         self.keys = list()
 
-    def run(self, key, text, action=ENCRYPT, padding=False):
+    def run(self, key, text, action=CipherMode.ENCRYPT, padding=False):
         if len(key) < 8:
             raise ValueError("Key Should be 8 bytes long")
         elif len(key) > 8:
@@ -25,7 +28,7 @@ class BlockCipherDES:
         self.password = key
         self.text = text
 
-        if padding and action == ENCRYPT:
+        if padding and action == CipherMode.ENCRYPT:
             self.addPadding()
         elif (
             len(self.text) % 8 != 0
@@ -44,7 +47,7 @@ class BlockCipherDES:
             tmp = None
             for i in range(16):  # Do the 16 rounds
                 d_e = self.expand(d, E)  # Expand d to match Ki size (48bits)
-                if action == ENCRYPT:
+                if action == CipherMode.ENCRYPT:
                     tmp = self.xor(self.keys[i], d_e)  # If encrypt use Ki
                 else:
                     tmp = self.xor(
@@ -59,7 +62,7 @@ class BlockCipherDES:
                 d + g, PI_1
             )  # Do the last permut and append the result to result
         final_res = bit_array_to_string(result)
-        if padding and action == DECRYPT:
+        if padding and action == CipherMode.DECRYPT:
             return self.removePadding(
                 final_res
             )  # Remove the padding if decrypt and padding is true
@@ -127,10 +130,10 @@ class BlockCipherDES:
         return data[:-pad_len]
 
     def encrypt(self, key, text, padding=False) -> str:
-        return self.run(key=key, text=text, action=ENCRYPT, padding=padding)
+        return self.run(key=key, text=text, action=CipherMode.ENCRYPT, padding=padding)
 
     def decrypt(self, key, text, padding=False) -> str:
-        return self.run(key=key, text=text, action=DECRYPT, padding=padding)
+        return self.run(key=key, text=text, action=CipherMode.DECRYPT, padding=padding)
 
 
 if __name__ == "__main__":
