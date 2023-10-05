@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "pydes"
+version = "0.1.0"
+description = "Plain pydes implementation"
+authors = ["KRACKY <46194176+KRACK-BIT@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
