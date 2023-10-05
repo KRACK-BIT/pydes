@@ -17,7 +17,8 @@ def binvalue(val, bitsize) -> str:
     return binval
 
 
-def string_to_bit_array(text) -> list[int]:  # Convert a string into a list of bits
+def string_to_bit_array(text) -> list[int]:
+    """Convert a string into a list of bits."""
     array = list()
     for char in text:
         binval = binvalue(char, 8)  # Get the char value on one byte
@@ -25,7 +26,8 @@ def string_to_bit_array(text) -> list[int]:  # Convert a string into a list of b
     return array
 
 
-def bit_array_to_string(array) -> str:  # Recreate the string from the bit array
+def bit_array_to_string(array) -> str:
+    """Recreate the string from the bit array."""
     res = "".join(
         [
             chr(int(y, 2))
