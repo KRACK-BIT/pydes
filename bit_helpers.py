@@ -2,9 +2,9 @@
 # -*- coding: utf8 -*-
 
 
-def nsplit(s: list, n: int) -> list[list]:
+def nsplit(meta_list: list, n: int) -> list[list]:
     """Split a list into sublists of size `n`"""
-    return [s[k : k + n] for k in range(0, len(s), n)]
+    return [meta_list[k : k + n] for k in range(0, len(meta_list), n)]
 
 
 def binvalue(val, bitsize) -> str:
