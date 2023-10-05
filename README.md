@@ -1,12 +1,9 @@
-pydes
-=====
+# pydes
 
 Basic but pure DES implementation in Python
 I have written it for fun because nothing else.
 
-
-How it works ?
---------------
+## How it works ?
 
 Everything is made within a class called "des". This class can be instanciated once and used to cipher and decipher multiple datas.
 It also support padding using the PKCS5 specification. (So the data is padding even if it is multiple of 8 to be sure that the last byte il be padding data).
@@ -16,8 +13,7 @@ throught all the blocks and for each do the 16th rounds.
 
 Be careful: This module implement DES in ECB mode, so you can't make it weaker. I didn't made it to be strong but for fun.
 
-How to use it ?
----------------
+## How to use it ?
 
 I have not done any interface to take argument in command line so this module can't be used as a script. (feel free to modify it).
 To use it from python shell or in another module do:
